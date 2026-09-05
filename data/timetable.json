@@ -1,0 +1,229 @@
+{
+    "class": "CSD",
+    "department": "CSE(DS)",
+    "semester": "III/I",
+    "room_no": "402 (Block III)",
+    "schedule": {
+        "Monday": [
+            {
+                "period": 1,
+                "time": "09:00 - 09:50",
+                "subject": "ML LAB",
+                "code": "23AI406"
+            },
+            {
+                "period": 2,
+                "time": "09:50 - 10:40",
+                "subject": "ML LAB",
+                "code": "23AI406"
+            },
+            {
+                "period": 3,
+                "time": "10:40 - 11:30",
+                "subject": "ML LAB",
+                "code": "23AI406"
+            },
+            {
+                "period": 4,
+                "time": "11:30 - 12:20",
+                "subject": "T LAB",
+                "code": "23DS509"
+            },
+            {
+                "period": 5,
+                "time": "01:10 - 02:00",
+                "subject": "23CS403",
+                "code": "23CS403"
+            },
+            {
+                "period": 6,
+                "time": "02:00 - 02:50",
+                "subject": "23CS601",
+                "code": "23CS601"
+            },
+            {
+                "period": 7,
+                "time": "02:50 - 03:40",
+                "subject": "23CS601",
+                "code": "23CS601"
+            }
+        ],
+        "Tuesday": [
+            {
+                "period": 1,
+                "time": "09:00 - 09:50",
+                "subject": "23AI403",
+                "code": "23AI403"
+            },
+            {
+                "period": 2,
+                "time": "09:50 - 10:40",
+                "subject": "23CS601",
+                "code": "23CS601"
+            },
+            {
+                "period": 3,
+                "time": "10:40 - 11:30",
+                "subject": "23AI403",
+                "code": "23AI403"
+            },
+            {
+                "period": 4,
+                "time": "11:30 - 12:20",
+                "subject": "23CS304",
+                "code": "23CS304"
+            },
+            {
+                "period": 5,
+                "time": "01:10 - 02:00",
+                "subject": "23CS403",
+                "code": "23CS403"
+            },
+            {
+                "period": 6,
+                "time": "02:00 - 02:50",
+                "subject": "OE1",
+                "code": "OE1"
+            },
+            {
+                "period": 7,
+                "time": "02:50 - 03:40",
+                "subject": "OE1",
+                "code": "OE1"
+            }
+        ],
+        "Wednesday": [
+            {
+                "period": 1,
+                "time": "09:00 - 09:50",
+                "subject": "23CS304",
+                "code": "23CS304"
+            },
+            {
+                "period": 2,
+                "time": "09:50 - 10:40",
+                "subject": "23CS403",
+                "code": "23CS403"
+            },
+            {
+                "period": 3,
+                "time": "10:40 - 11:30",
+                "subject": "23CS601",
+                "code": "23CS601"
+            },
+            {
+                "period": 4,
+                "time": "11:30 - 12:20",
+                "subject": "23AI403",
+                "code": "23AI403"
+            },
+            {
+                "period": 5,
+                "time": "01:10 - 02:00",
+                "subject": "T LAB",
+                "code": "23DS509"
+            },
+            {
+                "period": 6,
+                "time": "02:00 - 02:50",
+                "subject": "23AI403",
+                "code": "23AI403"
+            },
+            {
+                "period": 7,
+                "time": "02:50 - 03:40",
+                "subject": "Mentoring",
+                "code": "MENTORING"
+            }
+        ],
+        "Thursday": [
+            {
+                "period": 1,
+                "time": "09:00 - 09:50",
+                "subject": "CN LAB",
+                "code": "23CS608"
+            },
+            {
+                "period": 2,
+                "time": "09:50 - 10:40",
+                "subject": "CN LAB",
+                "code": "23CS608"
+            },
+            {
+                "period": 3,
+                "time": "10:40 - 11:30",
+                "subject": "CN LAB",
+                "code": "23CS608"
+            },
+            {
+                "period": 4,
+                "time": "11:30 - 12:20",
+                "subject": "23CS304",
+                "code": "23CS304"
+            },
+            {
+                "period": 5,
+                "time": "01:10 - 02:00",
+                "subject": "23AI403",
+                "code": "23AI403"
+            },
+            {
+                "period": 6,
+                "time": "02:00 - 02:50",
+                "subject": "23CS403",
+                "code": "23CS403"
+            },
+            {
+                "period": 7,
+                "time": "02:50 - 03:40",
+                "subject": "Mentoring",
+                "code": "MENTORING"
+            }
+        ],
+        "Friday": [
+            {
+                "period": 1,
+                "time": "09:00 - 09:50",
+                "subject": "23DS503",
+                "code": "23DS503"
+            },
+            {
+                "period": 2,
+                "time": "09:50 - 10:40",
+                "subject": "23DS503",
+                "code": "23DS503"
+            },
+            {
+                "period": 3,
+                "time": "10:40 - 11:30",
+                "subject": "23CS304",
+                "code": "23CS304"
+            },
+            {
+                "period": 4,
+                "time": "11:30 - 12:20",
+                "subject": "23AI403",
+                "code": "23AI403"
+            },
+            {
+                "period": 5,
+                "time": "01:10 - 02:00",
+                "subject": "23CS601",
+                "code": "23CS601"
+            },
+            {
+                "period": 6,
+                "time": "02:00 - 02:50",
+                "subject": "OE1",
+                "code": "OE1"
+            },
+            {
+                "period": 7,
+                "time": "02:50 - 03:40",
+                "subject": "OE1",
+                "code": "OE1"
+            }
+        ],
+        "Saturday": "HOLIDAY"
+    }
+}

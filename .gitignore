@@ -1,0 +1,26 @@
+# Environment secrets
+.env
+
+# Python artifacts
+__pycache__/
+*.py[cod]
+*$py.class
+venv/
+.venv/
+
+# Playwright & Scraping artifacts
+data/*.png
+data/*.html
+data/*.sqlite3
+data/*.db
+
+# OS files
+.DS_Store
+Thumbs.db
+playwright/.cache/
+scraped_data/
+
+# Internal prompt and log artifacts
+issues_prompts/
+prompts/
+*.log

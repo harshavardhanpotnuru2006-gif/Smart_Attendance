@@ -1,0 +1,1446 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NSRIT Academic Engine // Visual Intelligence Dashboard</title>
+    <!-- Chart.js & Marked.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <style>
+        :root {
+            --bg-canvas: #0D0E12;
+            --bg-panel: #1E1F24;
+            --bg-element: #262830;
+            --border-color: #2C2D35;
+            --text-primary: #D4D5DC;
+            --text-secondary: #7D8290;
+            --text-white: #FFFFFF;
+            
+            /* Veloretti Luxury Accents */
+            --accent-gold: #D4AF37;
+            --accent-gold-hover: #E2BF48;
+            --accent-amber: #C5A059;
+            --status-olive: #A3A878;
+            --status-terracotta: #C85A48;
+            
+            --font-main: system-ui, -apple-system, "Segoe UI", "JetBrains Mono", monospace;
+            --font-mono: "JetBrains Mono", monospace;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-canvas);
+            color: var(--text-primary);
+            font-family: var(--font-main);
+            font-size: 13px;
+            line-height: 1.4;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* ----------------------------------------------------
+           1. EPIC COSMIC CANVAS & AUTH GATEWAY OVERLAY 
+           ---------------------------------------------------- */
+        .gateway-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: #0D0E12;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: opacity 0.6s ease, transform 0.6s ease;
+        }
+
+        .gateway-overlay.unmounted {
+            opacity: 0;
+            pointer-events: none;
+            transform: translateY(40px);
+        }
+
+        /* Native Fullscreen HTML5 Cosmic Canvas */
+        #cosmic-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            transition: opacity 0.8s ease;
+        }
+
+        /* Morphed Auth Card with Gold Perimeter Highlight */
+        .auth-card {
+            background-color: var(--bg-panel);
+            border: 1px solid var(--accent-gold);
+            border-radius: 8px;
+            width: 420px;
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            box-shadow: 0 0 40px rgba(212, 175, 55, 0.15), 0 24px 36px -8px rgba(0, 0, 0, 0.8);
+            position: relative;
+            z-index: 10;
+            opacity: 0;
+            transform: scale(0.95) translateY(12px);
+            transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1), transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+            pointer-events: none;
+        }
+
+        .auth-card.active {
+            opacity: 1;
+            transform: scale(1) translateY(0);
+            pointer-events: auto;
+        }
+
+        .auth-brand {
+            font-family: var(--font-mono);
+            font-size: 10px;
+            color: var(--accent-gold);
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        .auth-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--text-white);
+            font-family: var(--font-mono);
+            letter-spacing: 0.5px;
+        }
+
+        .form-field {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .form-label {
+            font-family: var(--font-mono);
+            font-size: 10px;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+        }
+
+        .form-input {
+            background-color: #121318;
+            border: 1px solid var(--border-color);
+            border-bottom: 2px solid var(--border-color);
+            border-radius: 4px;
+            color: var(--text-white);
+            font-family: var(--font-mono);
+            font-size: 13px;
+            padding: 10px 12px;
+            outline: none;
+            transition: all 0.2s ease;
+        }
+
+        .form-input:focus {
+            border-color: var(--accent-gold);
+            border-bottom: 2px solid var(--accent-gold);
+            box-shadow: 0 4px 12px rgba(212, 175, 55, 0.12);
+        }
+
+        .ticker-status {
+            font-family: var(--font-mono);
+            font-size: 11px;
+            color: var(--accent-amber);
+            min-height: 18px;
+        }
+
+        .ticker-status.error {
+            color: var(--status-terracotta);
+        }
+
+        /* Gold Aura Glow Button */
+        .btn-gold-glow {
+            background-color: var(--accent-gold);
+            color: #0F1012;
+            border: 1px solid var(--accent-gold);
+            border-radius: 4px;
+            padding: 12px;
+            font-family: var(--font-mono);
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .btn-gold-glow:hover {
+            transform: translateY(-1.5px);
+            background-color: var(--accent-gold-hover);
+            box-shadow: 0 6px 22px rgba(212, 175, 55, 0.35);
+        }
+
+        .btn-gold-glow:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        /* ----------------------------------------------------
+           2. MAIN DASHBOARD CONTENT (STRICTLY HIDDEN UNTIL AUTHENTICATED)
+           ---------------------------------------------------- */
+        .app-view {
+            display: none; /* Mandatory Gate */
+            flex-direction: column;
+            height: 100vh;
+            opacity: 0;
+            transition: opacity 0.4s ease;
+        }
+
+        .app-view.visible {
+            display: flex;
+            opacity: 1;
+        }
+
+        /* Top Identity Bar */
+        .top-bar {
+            height: 52px;
+            background-color: var(--bg-panel);
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+            flex-shrink: 0;
+        }
+
+        .student-identity {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-family: var(--font-mono);
+        }
+
+        .student-name {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--accent-gold);
+            letter-spacing: 0.5px;
+        }
+
+        .identity-tag {
+            background-color: var(--bg-canvas);
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            padding: 3px 8px;
+            font-size: 11px;
+            color: var(--text-secondary);
+        }
+
+        .top-actions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .btn-gold {
+            background-color: var(--accent-gold);
+            color: #0F1012;
+            border: 1px solid var(--accent-gold);
+            border-radius: 4px;
+            padding: 6px 14px;
+            font-family: var(--font-mono);
+            font-size: 11px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+
+        .btn-gold:hover {
+            background-color: var(--accent-gold-hover);
+        }
+
+        .btn-outline {
+            background-color: transparent;
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            padding: 6px 12px;
+            font-family: var(--font-mono);
+            font-size: 11px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .btn-outline:hover {
+            border-color: var(--text-secondary);
+            color: var(--text-white);
+        }
+
+        /* Split Screen Main Layout */
+        .main-layout {
+            display: flex;
+            flex: 1;
+            height: calc(100vh - 52px);
+            overflow: hidden;
+        }
+
+        /* Left Panel - Visual Analytics Engine (58%) */
+        .left-panel {
+            width: 58%;
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            background-color: var(--bg-canvas);
+            overflow-y: auto;
+            padding: 20px;
+            gap: 20px;
+        }
+
+        .section-header {
+            font-family: var(--font-mono);
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+
+        /* Hero Visual Analytics Row */
+        .hero-analytics-grid {
+            display: grid;
+            grid-template-columns: 1.4fr 1.6fr 1fr;
+            gap: 14px;
+        }
+
+        .hero-card {
+            background-color: var(--bg-panel);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 14px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            position: relative;
+        }
+
+        .radial-container {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .svg-gauge {
+            width: 64px;
+            height: 64px;
+            transform: rotate(-90deg);
+        }
+
+        .svg-gauge circle {
+            fill: none;
+            stroke-width: 6;
+        }
+
+        .gauge-bg {
+            stroke: var(--bg-element);
+        }
+
+        .gauge-fill {
+            stroke: var(--accent-gold);
+            stroke-dasharray: 169.64;
+            stroke-dashoffset: 40;
+            transition: stroke-dashoffset 0.6s ease, stroke 0.3s ease;
+        }
+
+        .gauge-fill.shortage {
+            stroke: var(--status-terracotta);
+        }
+
+        .radial-info {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .radial-pct {
+            font-family: var(--font-mono);
+            font-size: 22px;
+            font-weight: 700;
+            font-variant-numeric: tabular-nums;
+            color: var(--text-white);
+        }
+
+        .radial-pct.shortage {
+            color: var(--status-terracotta);
+        }
+
+        .radial-label {
+            font-size: 11px;
+            color: var(--text-secondary);
+            font-family: var(--font-mono);
+            text-transform: uppercase;
+        }
+
+        .health-indicator-card {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .health-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-family: var(--font-mono);
+            font-size: 11px;
+            font-weight: 700;
+            padding: 6px 10px;
+            border-radius: 4px;
+            width: fit-content;
+        }
+
+        .health-pill.olive {
+            background-color: rgba(163, 168, 120, 0.12);
+            color: var(--status-olive);
+            border: 1px solid rgba(163, 168, 120, 0.3);
+        }
+
+        .health-pill.terracotta {
+            background-color: rgba(200, 90, 72, 0.12);
+            color: var(--status-terracotta);
+            border: 1px solid rgba(200, 90, 72, 0.3);
+        }
+
+        .metric-subtext {
+            font-family: var(--font-mono);
+            font-size: 11px;
+            color: var(--text-secondary);
+            font-variant-numeric: tabular-nums;
+        }
+
+        .cgpa-card {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .cgpa-value {
+            font-family: var(--font-mono);
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--accent-gold);
+            font-variant-numeric: tabular-nums;
+        }
+
+        /* 2-Column Subject Intelligence Cards Grid */
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+
+        .subject-card {
+            background-color: var(--bg-panel);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 14px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            transition: border-color 0.15s ease;
+        }
+
+        .subject-card:hover {
+            border-color: #3C3E4A;
+        }
+
+        .subject-card.is-shortage {
+            border-color: rgba(200, 90, 72, 0.4);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 8px;
+        }
+
+        .card-title {
+            font-weight: 600;
+            font-size: 13px;
+            color: var(--text-white);
+        }
+
+        /* Margin Badge */
+        .margin-badge {
+            font-family: var(--font-mono);
+            font-size: 10px;
+            font-weight: 700;
+            padding: 3px 8px;
+            border-radius: 3px;
+            white-space: nowrap;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .badge-olive {
+            background-color: rgba(163, 168, 120, 0.12);
+            color: var(--status-olive);
+            border: 1px solid rgba(163, 168, 120, 0.3);
+        }
+
+        .badge-terracotta {
+            background-color: rgba(200, 90, 72, 0.12);
+            color: var(--status-terracotta);
+            border: 1px solid rgba(200, 90, 72, 0.3);
+        }
+
+        .card-metrics {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            font-family: var(--font-mono);
+        }
+
+        .card-pct {
+            font-size: 17px;
+            font-weight: 700;
+            font-variant-numeric: tabular-nums;
+            color: var(--accent-gold);
+        }
+
+        .card-pct.is-shortage {
+            color: var(--status-terracotta);
+        }
+
+        .card-counts {
+            font-size: 11px;
+            color: var(--text-secondary);
+            font-variant-numeric: tabular-nums;
+        }
+
+        /* Dual-tone Progress Track */
+        .dual-progress-track {
+            height: 4px;
+            width: 100%;
+            background-color: var(--bg-element);
+            border-radius: 2px;
+            overflow: hidden;
+        }
+
+        .dual-progress-bar {
+            height: 100%;
+            background-color: var(--accent-gold);
+            border-radius: 2px;
+            transition: width 0.4s ease;
+        }
+
+        .dual-progress-bar.is-shortage {
+            background-color: var(--status-terracotta);
+        }
+
+        /* Semester SGPA Chart Section */
+        .chart-container-card {
+            background-color: var(--bg-panel);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 16px;
+            height: 200px;
+            position: relative;
+        }
+
+        /* Right Panel - Command Console (42%) */
+        .right-panel {
+            width: 42%;
+            display: flex;
+            flex-direction: column;
+            background-color: var(--bg-canvas);
+        }
+
+        .console-header {
+            height: 38px;
+            background-color: var(--bg-panel);
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            padding: 0 14px;
+            font-family: var(--font-mono);
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--accent-gold);
+            letter-spacing: 0.5px;
+        }
+
+        .console-stream {
+            flex: 1;
+            padding: 16px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            font-family: var(--font-mono);
+            font-size: 12px;
+            line-height: 1.5;
+        }
+
+        .console-line {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+
+        .console-user {
+            color: var(--accent-gold);
+        }
+
+        .console-ai {
+            color: var(--text-primary);
+            border-left: 2px solid var(--border-color);
+            padding-left: 10px;
+        }
+
+        /* Luxury Aesthetic Timetable & Markdown Tables */
+        .table-wrapper {
+            overflow-x: auto;
+            margin: 12px 0;
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+        }
+
+        .console-line table {
+            border-collapse: collapse;
+            width: 100%;
+            font-family: var(--font-mono);
+            font-size: 12px;
+            margin: 12px 0;
+        }
+
+        .console-line th {
+            background-color: #16171A;
+            color: #D4AF37;
+            border-bottom: 1px solid #D4AF37;
+            padding: 8px 12px;
+            text-align: left;
+            font-weight: 700;
+        }
+
+        .console-line td {
+            background-color: #1E1F24;
+            border-bottom: 1px solid #2C2D35;
+            color: #E6EDF3;
+            padding: 8px 12px;
+        }
+
+        .console-line tr:hover td {
+            background-color: #25262C;
+        }
+
+        .console-system {
+            color: var(--text-secondary);
+            font-style: italic;
+        }
+
+        .console-input-bar {
+            background-color: var(--bg-panel);
+            border-top: 1px solid var(--border-color);
+            padding: 12px;
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .console-prefix {
+            font-family: var(--font-mono);
+            color: var(--accent-gold);
+            font-weight: 700;
+        }
+
+        .console-input {
+            flex: 1;
+            background-color: var(--bg-canvas);
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            color: var(--text-primary);
+            font-family: var(--font-mono);
+            font-size: 12px;
+            padding: 8px 12px;
+            outline: none;
+        }
+
+        .console-input:focus {
+            border-color: var(--accent-gold);
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 1. EPIC COSMIC SUPERNOVA & DISINTEGRATION CANVAS GATEWAY OVERLAY -->
+    <div class="gateway-overlay" id="gateway-overlay">
+        
+        <!-- Native Fullscreen HTML5 Cosmic Canvas -->
+        <canvas id="cosmic-canvas"></canvas>
+
+        <!-- Morphed Auth Card Container -->
+        <div class="auth-card" id="auth-card">
+            <div>
+                <div class="auth-brand">NSRIT ACADEMIC INTELLIGENCE</div>
+                <div class="auth-title">SECURE GATEWAY</div>
+            </div>
+
+            <div class="form-field">
+                <label class="form-label" for="login-user">Portal Username / Roll No</label>
+                <input type="text" class="form-input" id="login-user" placeholder="e.g. 24NU1A4437" autocomplete="username">
+            </div>
+
+            <div class="form-field">
+                <label class="form-label" for="login-pwd">Portal Password</label>
+                <input type="password" class="form-input" id="login-pwd" placeholder="Enter password" autocomplete="current-password" onkeydown="if(event.key==='Enter') submitLogin()">
+            </div>
+
+            <div class="ticker-status" id="ticker-status"></div>
+
+            <button class="btn-gold-glow" id="btn-login" onclick="submitLogin()">Connect Portal</button>
+        </div>
+
+    </div>
+
+    <!-- 2. MAIN DASHBOARD CONTENT (STRICTLY HIDDEN UNTIL AUTHENTICATED) -->
+    <div class="app-view" id="app-view">
+        
+        <!-- Top Identity Bar -->
+        <header class="top-bar">
+            <div class="student-identity">
+                <span class="student-name" id="student-name">Loading...</span>
+                <span class="identity-tag" id="student-roll">----</span>
+                <span class="identity-tag" id="student-branch">----</span>
+                <span class="identity-tag" id="student-sem">----</span>
+            </div>
+            <div class="top-actions">
+                <button class="btn-outline" onclick="disconnectStudent()">Disconnect / Switch Student</button>
+                <button class="btn-gold" id="btn-sync" onclick="syncPortal()">Sync Portal</button>
+            </div>
+        </header>
+
+        <!-- Split Screen Main Layout -->
+        <main class="main-layout">
+
+            <!-- Left Panel: Visual Analytics Engine (58%) -->
+            <section class="left-panel">
+
+                <!-- Hero Visual Analytics Row -->
+                <div>
+                    <div class="section-header">Academic Visual Analytics</div>
+                    <div class="hero-analytics-grid">
+                        
+                        <!-- SVG Radial Attendance Gauge -->
+                        <div class="hero-card">
+                            <div class="radial-container">
+                                <svg class="svg-gauge" viewBox="0 0 60 60">
+                                    <circle class="gauge-bg" cx="30" cy="30" r="27"></circle>
+                                    <circle class="gauge-fill" id="gauge-fill-circle" cx="30" cy="30" r="27"></circle>
+                                </svg>
+                                <div class="radial-info">
+                                    <span class="radial-pct" id="hero-attendance">--%</span>
+                                    <span class="radial-label">Overall</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Academic Health Indicator -->
+                        <div class="hero-card health-indicator-card">
+                            <div class="radial-label">Academic Health Status</div>
+                            <div class="health-pill olive" id="health-pill">Calculated Margin...</div>
+                            <div class="metric-subtext" id="held-attended-text">0 Held • 0 Attended</div>
+                        </div>
+
+                        <!-- CGPA Performance Card -->
+                        <div class="hero-card cgpa-card">
+                            <div class="radial-label">Cumulative CGPA</div>
+                            <div class="cgpa-value" id="cgpa-val">-.--</div>
+                            <div class="metric-subtext" id="credits-text">Credits: --/--</div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- Subject Breakdown Grid (Interactive Visual Cards) -->
+                <div>
+                    <div class="section-header">
+                        <span>Subject Intelligence Cards</span>
+                        <span id="subject-count-tag" style="font-weight: normal; color: var(--text-secondary);">0 Subjects</span>
+                    </div>
+                    <div class="cards-grid" id="cards-grid">
+                        <div style="grid-column: span 2; text-align: center; color: var(--text-secondary); padding: 24px; font-family: var(--font-mono);">
+                            Authenticating &amp; rendering subject cards...
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Semester SGPA Performance Line Chart -->
+                <div>
+                    <div class="section-header">Semester SGPA Progression</div>
+                    <div class="chart-container-card">
+                        <canvas id="sgpaChart"></canvas>
+                    </div>
+                </div>
+
+            </section>
+
+            <!-- Right Panel: Command Console (42%) -->
+            <section class="right-panel">
+                <div class="console-header">
+                    COMMAND CONSOLE // GEMINI-2.5-FLASH ACADEMIC ASSISTANT
+                </div>
+                
+                <div class="console-stream" id="console-stream">
+                    <div class="console-line console-system">
+                        [SYSTEM] Authenticated session ready. Enter leave scenarios or timetable inquiries.
+                    </div>
+                </div>
+
+                <div class="console-input-bar">
+                    <span class="console-prefix">&gt;</span>
+                    <input type="text" class="console-input" id="console-input" placeholder="Ask about leave impact, timetable, attendance target..." onkeydown="if(event.key==='Enter') sendChatMessage()">
+                    <button class="btn-gold" id="btn-send" onclick="sendChatMessage()">Send</button>
+                </div>
+            </section>
+
+        </main>
+
+    </div>
+
+    <!-- 3. NATIVE HTML5 CANVAS ENGINE SCRIPT -->
+    <script>
+        let animFrameId = null;
+        let sgpaChartInstance = null;
+
+        function initCosmicCanvas() {
+            const canvas = document.getElementById('cosmic-canvas');
+            const ctx = canvas.getContext('2d');
+
+            function resize() {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+            }
+            resize();
+            window.addEventListener('resize', resize);
+
+            const cx = () => canvas.width / 2;
+            const cy = () => canvas.height / 2;
+
+            const startTime = performance.now();
+
+            // Planets configuration
+            const planets = [
+                { name: 'Mercury', rx: 80, ry: 50, speed: 1.6, color: '#E5C158', r: 5, angle: 0, disintegrated: false },
+                { name: 'Venus',   rx: 140, ry: 85, speed: 1.2, color: '#D48F37', r: 7, angle: 2.1, disintegrated: false },
+                { name: 'Earth',   rx: 210, ry: 130, speed: 0.8, color: '#58A6E5', r: 8, angle: 4.2, disintegrated: false },
+                { name: 'Mars',    rx: 280, ry: 175, speed: 0.5, color: '#C85A48', r: 6, angle: 1.1, disintegrated: false }
+            ];
+
+            // Stardust particles
+            const stardust = [];
+            for (let i = 0; i < 90; i++) {
+                stardust.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height,
+                    r: Math.random() * 1.5 + 0.5,
+                    alpha: Math.random() * 0.6 + 0.2,
+                    vx: (Math.random() - 0.5) * 0.2,
+                    vy: (Math.random() - 0.5) * 0.2
+                });
+            }
+
+            // Supernova shockwave & sparks
+            let shockwaveRadius = 0;
+            const supernovaSparks = [];
+            const ashParticles = [];
+            const borderParticles = [];
+
+            let borderTargeted = false;
+
+            function animate(now) {
+                const t = (now - startTime) / 1000; // elapsed in seconds
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+                // Draw ambient background stardust
+                ctx.fillStyle = '#D4AF37';
+                stardust.forEach(p => {
+                    p.x += p.vx;
+                    p.y += p.vy;
+                    if (p.x < 0) p.x = canvas.width;
+                    if (p.x > canvas.width) p.x = 0;
+                    if (p.y < 0) p.y = canvas.height;
+                    if (p.y > canvas.height) p.y = 0;
+
+                    ctx.globalAlpha = p.alpha;
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+                    ctx.fill();
+                });
+                ctx.globalAlpha = 1.0;
+
+                // PHASE 1: Orbits & Central Sun (0.0s - 1.8s)
+                if (t < 1.8) {
+                    // Draw elliptical orbit paths
+                    ctx.strokeStyle = 'rgba(212, 175, 55, 0.12)';
+                    ctx.lineWidth = 1;
+                    planets.forEach(p => {
+                        ctx.beginPath();
+                        ctx.ellipse(cx(), cy(), p.rx, p.ry, 0, 0, Math.PI * 2);
+                        ctx.stroke();
+                    });
+
+                    // Draw Central Sun Corona Glow
+                    const sunR = 22 + Math.sin(t * 4) * 2;
+                    const grad = ctx.createRadialGradient(cx(), cy(), 0, cx(), cy(), sunR * 3);
+                    grad.addColorStop(0, '#FFF3B0');
+                    grad.addColorStop(0.3, '#D4AF37');
+                    grad.addColorStop(0.7, 'rgba(212, 175, 55, 0.2)');
+                    grad.addColorStop(1, 'rgba(212, 175, 55, 0)');
+
+                    ctx.fillStyle = grad;
+                    ctx.beginPath();
+                    ctx.arc(cx(), cy(), sunR * 3, 0, Math.PI * 2);
+                    ctx.fill();
+
+                    // Central Core Sun
+                    ctx.fillStyle = '#D4AF37';
+                    ctx.beginPath();
+                    ctx.arc(cx(), cy(), sunR, 0, Math.PI * 2);
+                    ctx.fill();
+
+                    // Render Orbiting Planets
+                    planets.forEach(p => {
+                        p.angle += p.speed * 0.016;
+                        p.x = cx() + Math.cos(p.angle) * p.rx;
+                        p.y = cy() + Math.sin(p.angle) * p.ry;
+
+                        ctx.fillStyle = p.color;
+                        ctx.beginPath();
+                        ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+                        ctx.fill();
+
+                        // Subtle glow around planet
+                        ctx.fillStyle = p.color;
+                        ctx.globalAlpha = 0.3;
+                        ctx.beginPath();
+                        ctx.arc(p.x, p.y, p.r * 1.8, 0, Math.PI * 2);
+                        ctx.fill();
+                        ctx.globalAlpha = 1.0;
+                    });
+                }
+                // PHASE 2: Core Contraction & Supernova Detonation (1.8s - 2.4s)
+                else if (t >= 1.8 && t < 2.4) {
+                    const phaseT = t - 1.8;
+
+                    // 1.8s - 2.0s: Rapid contraction into blinding point
+                    if (phaseT < 0.2) {
+                        const contractR = Math.max(2, 22 * (1 - phaseT / 0.2));
+                        ctx.fillStyle = '#FFFFFF';
+                        ctx.beginPath();
+                        ctx.arc(cx(), cy(), contractR, 0, Math.PI * 2);
+                        ctx.fill();
+                    } 
+                    // 2.0s - 2.4s: Supernova Explosion!
+                    else {
+                        const explodeT = phaseT - 0.2; // 0 to 0.4
+                        if (supernovaSparks.length === 0) {
+                            // Generate 320 golden spark particles
+                            for (let i = 0; i < 320; i++) {
+                                const angle = Math.random() * Math.PI * 2;
+                                const speed = Math.random() * 12 + 4;
+                                supernovaSparks.push({
+                                    x: cx(),
+                                    y: cy(),
+                                    vx: Math.cos(angle) * speed,
+                                    vy: Math.sin(angle) * speed,
+                                    r: Math.random() * 2.5 + 1,
+                                    alpha: 1.0,
+                                    color: Math.random() > 0.3 ? '#D4AF37' : '#FFB300'
+                                });
+                            }
+                        }
+
+                        // Shockwave ring expansion
+                        shockwaveRadius += 18;
+                        ctx.strokeStyle = 'rgba(212, 175, 55, ' + (1 - explodeT / 0.4) + ')';
+                        ctx.lineWidth = 3;
+                        ctx.beginPath();
+                        ctx.arc(cx(), cy(), shockwaveRadius, 0, Math.PI * 2);
+                        ctx.stroke();
+
+                        // Render Supernova Sparks
+                        supernovaSparks.forEach(sp => {
+                            sp.x += sp.vx;
+                            sp.y += sp.vy;
+                            sp.vx *= 0.96;
+                            sp.vy *= 0.96;
+                            sp.alpha *= 0.95;
+
+                            ctx.fillStyle = sp.color;
+                            ctx.globalAlpha = Math.max(0, sp.alpha);
+                            ctx.beginPath();
+                            ctx.arc(sp.x, sp.y, sp.r, 0, Math.PI * 2);
+                            ctx.fill();
+                        });
+                        ctx.globalAlpha = 1.0;
+                    }
+                }
+                // PHASE 3: Thanos-Snap Disintegration (2.4s - 3.2s)
+                else if (t >= 2.4 && t < 3.2) {
+                    if (ashParticles.length === 0) {
+                        planets.forEach(p => {
+                            // Shatter planet into 80 micro-ash dust particles
+                            for (let i = 0; i < 80; i++) {
+                                const angle = Math.random() * Math.PI * 2;
+                                const speed = Math.random() * 6 + 1;
+                                ashParticles.push({
+                                    x: p.x,
+                                    y: p.y,
+                                    vx: Math.cos(angle) * speed + (p.x - cx()) * 0.02,
+                                    vy: Math.sin(angle) * speed + (p.y - cy()) * 0.02,
+                                    r: Math.random() * 2 + 0.8,
+                                    alpha: 1.0,
+                                    color: p.color
+                                });
+                            }
+                        });
+                    }
+
+                    // Render Thanos Disintegration Ash Particles
+                    ashParticles.forEach(ap => {
+                        ap.x += ap.vx;
+                        ap.y += ap.vy;
+                        ap.vx *= 0.95;
+                        ap.vy *= 0.95;
+                        ap.alpha *= 0.96;
+
+                        ctx.fillStyle = ap.color;
+                        ctx.globalAlpha = Math.max(0, ap.alpha);
+                        ctx.beginPath();
+                        ctx.arc(ap.x, ap.y, ap.r, 0, Math.PI * 2);
+                        ctx.fill();
+                    });
+                    ctx.globalAlpha = 1.0;
+                }
+                // PHASE 4: Convergence into Auth Gateway (3.2s - 4.0s)
+                else if (t >= 3.2 && t <= 4.2) {
+                    const convT = (t - 3.2) / 0.8; // 0 to 1
+
+                    if (!borderTargeted) {
+                        borderTargeted = true;
+                        const cardW = 420;
+                        const cardH = 360;
+                        const minX = cx() - cardW / 2;
+                        const maxX = cx() + cardW / 2;
+                        const minY = cy() - cardH / 2;
+                        const maxY = cy() + cardH / 2;
+
+                        // Create 180 perimeter points around Auth Card box
+                        for (let i = 0; i < 180; i++) {
+                            let targetX, targetY;
+                            const side = Math.floor(Math.random() * 4);
+                            if (side === 0) { targetX = minX + Math.random() * cardW; targetY = minY; }
+                            else if (side === 1) { targetX = maxX; targetY = minY + Math.random() * cardH; }
+                            else if (side === 2) { targetX = minX + Math.random() * cardW; targetY = maxY; }
+                            else { targetX = minX; targetY = minY + Math.random() * cardH; }
+
+                            const startAngle = Math.random() * Math.PI * 2;
+                            const startDist = Math.random() * 300 + 150;
+
+                            borderParticles.push({
+                                startX: cx() + Math.cos(startAngle) * startDist,
+                                startY: cy() + Math.sin(startAngle) * startDist,
+                                targetX: targetX,
+                                targetY: targetY,
+                                r: Math.random() * 2 + 1,
+                                color: '#D4AF37'
+                            });
+                        }
+                    }
+
+                    // Animate convergence toward Auth Card border
+                    borderParticles.forEach(bp => {
+                        const currentX = bp.startX + (bp.targetX - bp.startX) * Math.min(1, convT);
+                        const currentY = bp.startY + (bp.targetY - bp.startY) * Math.min(1, convT);
+
+                        ctx.fillStyle = bp.color;
+                        ctx.globalAlpha = Math.min(1, convT * 1.5);
+                        ctx.beginPath();
+                        ctx.arc(currentX, currentY, bp.r, 0, Math.PI * 2);
+                        ctx.fill();
+                    });
+                    ctx.globalAlpha = 1.0;
+
+                    // Unhide Auth Card as convergence completes
+                    if (t >= 3.6) {
+                        const authCard = document.getElementById('auth-card');
+                        authCard.classList.add('active');
+                    }
+                }
+
+                // Auto-terminate animation loop at 4.2s to free resources
+                if (t < 4.2) {
+                    animFrameId = requestAnimationFrame(animate);
+                } else {
+                    canvas.style.opacity = '0';
+                    document.getElementById('login-user').focus();
+                }
+            }
+
+            animFrameId = requestAnimationFrame(animate);
+        }
+
+        // Initialize Canvas Intro on Load
+        window.addEventListener('DOMContentLoaded', () => {
+            initCosmicCanvas();
+        });
+
+        // Dynamic Auth Ticker & Login Handler with 60s AbortController
+        async function submitLogin() {
+            const user = document.getElementById('login-user').value.trim();
+            const pwd = document.getElementById('login-pwd').value.trim();
+            const ticker = document.getElementById('ticker-status');
+            const btn = document.getElementById('btn-login');
+
+            if (!user || !pwd) {
+                ticker.className = 'ticker-status error';
+                ticker.textContent = 'Please enter Roll Number and Password.';
+                return;
+            }
+
+            ticker.className = 'ticker-status';
+            btn.disabled = true;
+
+            const steps = [
+                'Connecting to college server...',
+                'Authenticating credentials...',
+                'Extracting attendance & marks ledger...',
+                'Rendering intelligence console...'
+            ];
+            let stepIndex = 0;
+            ticker.textContent = steps[0];
+
+            const tickerInterval = setInterval(() => {
+                stepIndex = (stepIndex + 1) % steps.length;
+                ticker.textContent = steps[stepIndex];
+            }, 3000);
+
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 60000);
+
+            try {
+                const res = await fetch('/api/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username: user, password: pwd }),
+                    signal: controller.signal
+                });
+                clearTimeout(timeoutId);
+                clearInterval(tickerInterval);
+
+                const data = await res.json();
+
+                if (res.ok) {
+                    ticker.textContent = 'Rendering intelligence console...';
+                    await new Promise(r => setTimeout(r, 400));
+                    
+                    renderDashboard(data.profile);
+
+                    document.getElementById('gateway-overlay').classList.add('unmounted');
+                    const appView = document.getElementById('app-view');
+                    appView.classList.add('visible');
+
+                    appendConsoleLine(`[SYSTEM] Authenticated session established for ${data.profile.student_name} (${data.profile.roll_no}).`, 'console-system');
+                } else {
+                    ticker.className = 'ticker-status error';
+                    ticker.textContent = data.error || 'Invalid Roll Number or Password';
+                }
+            } catch (err) {
+                clearTimeout(timeoutId);
+                clearInterval(tickerInterval);
+                ticker.className = 'ticker-status error';
+                if (err.name === 'AbortError') {
+                    ticker.textContent = 'Portal response timed out (60s limit exceeded).';
+                } else {
+                    ticker.textContent = err.message || 'Portal unreachable or network connection error.';
+                }
+            } finally {
+                btn.disabled = false;
+            }
+        }
+
+        // Disconnect Student & Destroy Session View
+        function disconnectStudent() {
+            const appView = document.getElementById('app-view');
+            appView.classList.remove('visible');
+
+            const gatewayOverlay = document.getElementById('gateway-overlay');
+            gatewayOverlay.classList.remove('unmounted');
+
+            document.getElementById('login-pwd').value = '';
+            const ticker = document.getElementById('ticker-status');
+            ticker.className = 'ticker-status';
+            ticker.textContent = 'Session terminated.';
+
+            document.getElementById('login-user').focus();
+        }
+
+        // Render Dashboard Metrics, Cards, and Chart
+        function renderDashboard(profile) {
+            if (!profile) return;
+
+            document.getElementById('student-name').textContent = profile.student_name || 'N/A';
+            document.getElementById('student-roll').textContent = profile.roll_no || 'N/A';
+            document.getElementById('student-branch').textContent = profile.branch || 'N/A';
+            document.getElementById('student-sem').textContent = profile.semester || 'N/A';
+
+            const attPct = parseFloat(profile.overall_attendance) || 0;
+            const attElem = document.getElementById('hero-attendance');
+            const fillCircle = document.getElementById('gauge-fill-circle');
+
+            attElem.textContent = profile.overall_attendance || '0.0%';
+
+            const maxCircumference = 169.64;
+            const offset = maxCircumference - (Math.min(attPct, 100) / 100 * maxCircumference);
+            fillCircle.style.strokeDashoffset = offset;
+
+            if (attPct < 75) {
+                attElem.classList.add('shortage');
+                fillCircle.classList.add('shortage');
+            } else {
+                attElem.classList.remove('shortage');
+                fillCircle.classList.remove('shortage');
+            }
+
+            const healthPill = document.getElementById('health-pill');
+            healthPill.textContent = profile.health_status || 'Calculated Margin...';
+            if (profile.is_shortage) {
+                healthPill.className = 'health-pill terracotta';
+            } else {
+                healthPill.className = 'health-pill olive';
+            }
+
+            document.getElementById('held-attended-text').textContent = `${profile.total_held || 0} Held • ${profile.total_attended || 0} Attended`;
+            document.getElementById('cgpa-val').textContent = profile.cgpa ? profile.cgpa.toFixed(2) : '-.--';
+            document.getElementById('credits-text').textContent = `Credits: ${profile.credits || '--/--'}`;
+
+            const cardsGrid = document.getElementById('cards-grid');
+            cardsGrid.innerHTML = '';
+
+            const subjects = profile.attendance_subjects || [];
+            document.getElementById('subject-count-tag').textContent = `${subjects.length} Subjects`;
+
+            if (subjects.length > 0) {
+                subjects.forEach(sub => {
+                    const pctVal = parseFloat(sub.percentage) || 0;
+                    const isShortage = sub.is_shortage || (pctVal < 75);
+
+                    const card = document.createElement('div');
+                    card.className = `subject-card ${isShortage ? 'is-shortage' : ''}`;
+
+                    card.innerHTML = `
+                        <div class="card-header">
+                            <span class="card-title">${sub.subject}</span>
+                            <span class="margin-badge ${isShortage ? 'badge-terracotta' : 'badge-olive'}">
+                                ${sub.margin_badge || (isShortage ? 'Shortage' : 'Safe')}
+                            </span>
+                        </div>
+                        <div class="card-metrics">
+                            <span class="card-pct ${isShortage ? 'is-shortage' : ''}">${sub.percentage}</span>
+                            <span class="card-counts">${sub.attended} / ${sub.held} Attended</span>
+                        </div>
+                        <div class="dual-progress-track">
+                            <div class="dual-progress-bar ${isShortage ? 'is-shortage' : ''}" style="width: ${Math.min(pctVal, 100)}%;"></div>
+                        </div>
+                    `;
+                    cardsGrid.appendChild(card);
+                });
+            } else {
+                cardsGrid.innerHTML = '<div style="grid-column: span 2; text-align: center; color: var(--text-secondary); padding: 24px;">No subject records found.</div>';
+            }
+
+            renderSGPAChart(profile.semesters_sgpa);
+        }
+
+        function renderSGPAChart(semestersData) {
+            const ctx = document.getElementById('sgpaChart').getContext('2d');
+            
+            const labels = semestersData ? Object.keys(semestersData) : ['1/4 Sem-I', '1/4 Sem-II', '2/4 Sem-I', '2/4 Sem-II'];
+            const dataValues = semestersData ? Object.values(semestersData) : [8.27, 8.74, 8.95, 8.73];
+
+            if (sgpaChartInstance) {
+                sgpaChartInstance.destroy();
+            }
+
+            sgpaChartInstance = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'SGPA',
+                        data: dataValues,
+                        borderColor: '#D4AF37',
+                        backgroundColor: 'rgba(212, 175, 55, 0.08)',
+                        borderWidth: 2,
+                        tension: 0.3,
+                        pointBackgroundColor: '#D4AF37',
+                        pointBorderColor: '#1E1F24',
+                        pointRadius: 4,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        x: {
+                            grid: { color: '#2C2D35' },
+                            ticks: { color: '#7D8290', font: { family: 'JetBrains Mono', size: 10 } }
+                        },
+                        y: {
+                            min: 6.0,
+                            max: 10.0,
+                            grid: { color: '#2C2D35' },
+                            ticks: { color: '#7D8290', font: { family: 'JetBrains Mono', size: 10 } }
+                        }
+                    }
+                }
+            });
+        }
+
+        function renderMarkdown(text) {
+            if (typeof window.marked !== 'undefined') {
+                try {
+                    let html = marked.parse(text);
+                    html = html.replace(/(<table[\s\S]*?<\/table>)/gi, '<div class="table-wrapper">$1</div>');
+                    return html;
+                } catch (e) {
+                    console.error("Marked parse error:", e);
+                }
+            }
+            // Fallback Regex Markdown Table & Formatting Parser
+            let html = text;
+            const tableRegex = /((?:\|[^\n]+\|\r?\n)+)/g;
+            html = html.replace(tableRegex, (match) => {
+                const lines = match.trim().split('\n').map(l => l.trim()).filter(Boolean);
+                if (lines.length < 2) return match;
+                
+                let headerRow = lines[0];
+                let bodyRows = lines.slice(2);
+                
+                const parseRow = (row, tag) => {
+                    const cols = row.split('|').slice(1, -1).map(c => c.trim());
+                    return `<tr>${cols.map(c => `<${tag}>${c}</${tag}>`).join('')}</tr>`;
+                };
+
+                const headersHtml = parseRow(headerRow, 'th');
+                const bodyHtml = bodyRows.map(r => parseRow(r, 'td')).join('');
+
+                return `<div class="table-wrapper"><table><thead>${headersHtml}</thead><tbody>${bodyHtml}</tbody></table></div>`;
+            });
+
+            html = html
+                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                .replace(/\n/g, '<br>');
+
+            return html;
+        }
+
+        function appendConsoleLine(text, className) {
+            const stream = document.getElementById('console-stream');
+            const line = document.createElement('div');
+            line.className = `console-line ${className}`;
+
+            if (className === 'console-ai' || className === 'console-system') {
+                line.innerHTML = renderMarkdown(text);
+            } else {
+                line.textContent = text;
+            }
+
+            stream.appendChild(line);
+            stream.scrollTop = stream.scrollHeight;
+        }
+
+        async function sendChatMessage() {
+            const input = document.getElementById('console-input');
+            const btn = document.getElementById('btn-send');
+            const query = input.value.trim();
+
+            if (!query) return;
+
+            appendConsoleLine(`> ${query}`, 'console-user');
+            input.value = '';
+            input.disabled = true;
+            btn.disabled = true;
+
+            appendConsoleLine('[AI] Calculating scenario...', 'console-system');
+
+            try {
+                const res = await fetch('/api/chat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message: query })
+                });
+
+                const stream = document.getElementById('console-stream');
+                if (stream.lastChild && stream.lastChild.textContent === '[AI] Calculating scenario...') {
+                    stream.removeChild(stream.lastChild);
+                }
+
+                const data = await res.json();
+                if (res.ok) {
+                    appendConsoleLine(`[AI] ${data.reply}`, 'console-ai');
+                } else {
+                    appendConsoleLine(`[AI ERROR] ${data.error || 'Server error'}`, 'console-system');
+                }
+            } catch (err) {
+                appendConsoleLine('[AI ERROR] Connection to AI service failed.', 'console-system');
+            } finally {
+                input.disabled = false;
+                btn.disabled = false;
+                input.focus();
+            }
+        }
+
+        async function syncPortal() {
+            const btn = document.getElementById('btn-sync');
+            btn.disabled = true;
+            btn.textContent = 'Syncing...';
+
+            appendConsoleLine('[SYSTEM] Re-syncing portal data...', 'console-system');
+
+            try {
+                const res = await fetch('/api/sync', { method: 'POST' });
+                const data = await res.json();
+                if (res.ok) {
+                    renderDashboard(data.profile);
+                    appendConsoleLine('[SYSTEM] Portal data synchronized successfully.', 'console-system');
+                } else {
+                    appendConsoleLine(`[SYSTEM ERROR] Sync failed: ${data.error}`, 'console-system');
+                }
+            } catch (err) {
+                appendConsoleLine('[SYSTEM ERROR] Failed to invoke sync endpoint.', 'console-system');
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Sync Portal';
+            }
+        }
+    </script>
+</body>
+</html>
